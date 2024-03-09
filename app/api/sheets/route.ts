@@ -62,23 +62,21 @@ async function getResponse(req: NextRequest) {
 				}),
 			);
 		}
-		{
-			return new NextResponse(
-				getFrameHtmlResponse({
-					image: {
-						src: `${NEXT_PUBLIC_URL}/not.png`,
-						aspectRatio: "1.91:1",
+		return new NextResponse(
+			getFrameHtmlResponse({
+				image: {
+					src: `${NEXT_PUBLIC_URL}/not.png`,
+					aspectRatio: "1.91:1",
+				},
+				buttons: [
+					{
+						label: "Appeal this decision",
+						action: "link",
+						target: "https://onchainkit.xyz",
 					},
-					buttons: [
-						{
-							label: "Appeal this decision",
-							action: "link",
-							target: "https://onchainkit.xyz",
-						},
-					],
-				}),
-			);
-		}
+				],
+			}),
+		);
 	} catch (error) {
 		console.error("Error fetching data:", error);
 		return new NextResponse(
