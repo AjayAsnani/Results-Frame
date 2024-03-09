@@ -1,4 +1,4 @@
-import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
+import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit';
 import { NextRequest, NextResponse } from 'next/server';
 import { NEXT_PUBLIC_URL } from '../../config';
 
@@ -20,8 +20,6 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     console.error(e);
   }
 
-  let selectedButton = message?.button;
-
   return new NextResponse(
     getFrameHtmlResponse({
       image: {
@@ -35,11 +33,6 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
           target: 'https://onchainkit.xyz',
         },
       ],
-      postUrl: `${NEXT_PUBLIC_URL}/api/frame`,
-      state: {
-        page: state?.page + 1,
-        time: new Date().toISOString(),
-      },
     }),
   );
 }

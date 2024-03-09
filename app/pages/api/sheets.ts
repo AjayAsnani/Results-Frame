@@ -1,7 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { GoogleAuth } from 'google-auth-library'; // Import GoogleAuth class
+import { GoogleAuth } from 'google-auth-library';
 import { NEXT_PUBLIC_URL, SHEET } from '../../config';
+import { NextResponse } from 'next/server';
+import { getFrameHtmlResponse } from '@coinbase/onchainkit';
+import { private_key } from '../../../results-frames-757179e87fa8.json';
 
 interface User {
   id: string;
@@ -9,10 +12,8 @@ interface User {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const sheetId = SHEET;
-
-  // Use environment variables for secure credential storage
-  const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
+  const clientEmail = 'spreadsheetapi@results-frames.iam.gserviceaccount.com';
+  const privateKey = private_key;
 
   if (!clientEmail || !privateKey) {
     throw new Error('Missing Google Service Account credentials');
@@ -28,9 +29,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const client = await auth.getClient();
-    const doc = new GoogleSpreadsheet(sheetId);
-    doc.useApi(client);
-    await doc.loadInfo(); // Load sheet information
+    const doc = new GoogleSpreadsheet(sheetId, client);
+
+    await doc.loadInfo();
     const sheet = doc.sheetsByIndex[0];
     const rows = await sheet.getRows();
 
@@ -39,9 +40,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { userId }: { userId: string } = req.body;
 
     if (userIds.includes(userId)) {
-      res.status(200).json({ postUrl: `${NEXT_PUBLIC_URL}/api/frame2` });
+      return new NextResponse(
+        getFrameHtmlResponse({
+          image: {
+            src: `${NEXT_PUBLIC_URL}/interview.png`,
+            aspectRatio: '1.91:1',
+          },
+          buttons: [
+            {
+              label: 'Book a call with @Saxenasaheb',
+              action: 'link',
+              target: 'https://onchainkit.xyz',
+            },
+          ],
+        }),
+      );
     } else {
-      res.status(200).json({ postUrl: `${NEXT_PUBLIC_URL}/api/frame3` });
+      return new NextResponse(
+        getFrameHtmlResponse({
+          image: {
+            src: `${NEXT_PUBLIC_URL}/not.png`,
+            aspectRatio: '1.91:1',
+          },
+          buttons: [
+            {
+              label: 'Appeal this decision',
+              action: 'link',
+              target: 'https://onchainkit.xyz',
+            },
+          ],
+        }),
+      );
     }
   } catch (error) {
     console.error('Error fetching data:', error);
