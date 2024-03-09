@@ -22,17 +22,26 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
 
   let selectedButton = message?.button;
 
+  const buttons = [
+    {
+      label: 'Tell it to the world',
+      action: 'link',
+      target: 'https://onchainkit.xyz',
+    },
+  ];
+
   return new NextResponse(
     getFrameHtmlResponse({
+      // Specify image and buttons in desired order
       image: {
-        src: `${NEXT_PUBLIC_URL}/interview.png`,
+        src: `${NEXT_PUBLIC_URL}/selected.png`,
         aspectRatio: '1.91:1',
       },
       buttons: [
         {
-          label: 'Book a call with @Saxenasaheb',
+          label: 'Tell it to the world',
           action: 'link',
-          target: 'https://onchainkit.xyz',
+          target: 'https://twitter.com/home',
         },
       ],
       postUrl: `${NEXT_PUBLIC_URL}/api/frame`,

@@ -1,36 +1,42 @@
-import { FrameRequest, getFrameMessage } from '@coinbase/onchainkit/frame';
+import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
 import { NextRequest, NextResponse } from 'next/server';
-import { encodeFunctionData, parseEther } from 'viem';
-import { base } from 'viem/chains';
-import BuyMeACoffeeABI from '../../_contracts/BuyMeACoffeeABI';
-import { BUY_MY_COFFEE_CONTRACT_ADDR } from '../../config';
-import type { FrameTransactionResponse } from '@coinbase/onchainkit/frame';
+import { NEXT_PUBLIC_URL } from '../../config';
 
-async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
+async function getResponse(req: NextRequest): Promise<NextResponse> {
+  let accountAddress: string | undefined = '';
+  let text: string | undefined = '';
+
   const body: FrameRequest = await req.json();
-  const { isValid } = await getFrameMessage(body, { neynarApiKey: 'NEYNAR_ONCHAIN_KIT' });
+  const { isValid, message } = await getFrameMessage(body, { neynarApiKey: 'NEYNAR_ONCHAIN_KIT' });
 
-  if (!isValid) {
-    return new NextResponse('Message not valid', { status: 500 });
+  if (isValid) {
+    accountAddress = message.interactor.verified_accounts[0];
   }
 
-  const data = encodeFunctionData({
-    abi: BuyMeACoffeeABI,
-    functionName: 'buyCoffee',
-    args: [parseEther('1'), 'zizzamia', '@zizzamia', 'Coffee all day!'],
-  });
+  if (message?.input) {
+    text = message.input;
+  }
 
-  const txData: FrameTransactionResponse = {
-    chainId: `eip155:${base.id}`,
-    method: 'eth_sendTransaction',
-    params: {
-      abi: [],
-      data,
-      to: BUY_MY_COFFEE_CONTRACT_ADDR,
-      value: parseEther('0.01').toString(), // 0.01 ETH
-    },
-  };
-  return NextResponse.json(txData);
+  if (message?.button === 3) {
+    return NextResponse.redirect(
+      'https://www.google.com/search?q=cute+dog+pictures&tbm=isch&source=lnms',
+      { status: 302 },
+    );
+  }
+
+  return new NextResponse(
+    getFrameHtmlResponse({
+      buttons: [
+        {
+          label: `🌲 ${text} 🌲`,
+        },
+      ],
+      image: {
+        src: `${NEXT_PUBLIC_URL}/park-1.png`,
+      },
+      postUrl: `${NEXT_PUBLIC_URL}/api/frame`,
+    }),
+  );
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
