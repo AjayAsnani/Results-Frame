@@ -1,7 +1,6 @@
 // use NODE_ENV to not have to change config based on where it's deployed
-export const NEXT_PUBLIC_URL =
-	"https://ab7c-2401-4900-1f29-7d93-9819-98ce-463f-9b80.ngrok-free.app";
+export const NEXT_PUBLIC_URL = 'https://93f1-2406-7400-63-314a-c848-9055-14f6-1bf.ngrok-free.app';
 // process.env.NODE_ENV == "development"
 // 	? "http://localhost:3000"
 // 	: "https://zizzamia.xyz";
-export const SHEET = "14oEo-L83pDL1FHNt4kR9-fsR0pS-fes67uV_X-Mj7IE";
+export const SHEET = '1VbuXKUeMQnKjdqqGvqn9Ed0oMPTyLlv_gN1k1GM7KEE';
