@@ -1,21 +1,18 @@
-import { getFrameHtmlResponse } from "@coinbase/onchainkit";
+import { FrameRequest, getFrameHtmlResponse } from "@coinbase/onchainkit";
 import { GoogleAuth } from "google-auth-library";
 import { GoogleSpreadsheet } from "google-spreadsheet";
-import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
-import jsonData from "../../../results-frames-757179e87fa8.json";
+import { NextRequest, NextResponse } from "next/server";
+import jsonData from "../../../gAuthConfig";
 import { NEXT_PUBLIC_URL, SHEET } from "../../config";
 
 interface User {
 	id: string;
 }
 
-export default async function handler(
-	req: NextApiRequest,
-	res: NextApiResponse,
-) {
+async function getResponse(req: NextRequest) {
 	const sheetId = SHEET;
 	const clientEmail = "spreadsheetapi@results-frames.iam.gserviceaccount.com";
+
 	const privateKey = (jsonData as any).private_key;
 
 	if (!clientEmail || !privateKey) {
@@ -40,11 +37,14 @@ export default async function handler(
 
 		const userIds: string[] = rows.map((row) => row.get("ID"));
 
-		console.log(req.body);
+		const body: FrameRequest = await req.json();
+		const {
+			untrustedData: { url },
+		} = body;
 
-		const { userId }: { userId: string } = req.body;
+		const shouldBookInterview = true;
 
-		if (userIds.includes(userId)) {
+		if (shouldBookInterview) {
 			return new NextResponse(
 				getFrameHtmlResponse({
 					image: {
@@ -55,7 +55,8 @@ export default async function handler(
 						{
 							label: "Book a call with @Saxenasaheb",
 							action: "link",
-							target: "https://onchainkit.xyz",
+							target:
+								"https://calendly.com/saxenasahab/between-two-ferns?back=1&month=2024-03",
 						},
 					],
 				}),
@@ -80,6 +81,26 @@ export default async function handler(
 		}
 	} catch (error) {
 		console.error("Error fetching data:", error);
-		res.status(500).json({ message: "Error processing request" });
+		return new NextResponse(
+			getFrameHtmlResponse({
+				image: {
+					src: `${NEXT_PUBLIC_URL}/not.png`,
+					aspectRatio: "1.91:1",
+				},
+				buttons: [
+					{
+						label: "Something went wrong, please try again",
+						// Route back to home
+						// target: "https://onchainkit",
+					},
+				],
+			}),
+		);
 	}
 }
+
+export async function POST(req: NextRequest): Promise<Response> {
+	return getResponse(req);
+}
+
+export const dynamic = "force-dynamic";
