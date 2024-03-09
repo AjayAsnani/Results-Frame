@@ -56,7 +56,7 @@ async function getResponse(req: NextRequest) {
               label: 'Tell it to the world',
               action: 'link',
               target:
-                'https://warpcast.com/~/compose?text=Just%20got%20the%20sickest%20news%20-%20your%20fren%20is%20now%20officially%20part%20of%20the%20FBI%20crew!%20%20%20%20%20%20%20%20%20%F0%9F%95%B5%EF%B8%8F%E2%80%8D%E2%99%82%EF%B8%8F%F0%9F%94%A5%20Let%20the%20onchain%20games%20begin',
+                'https://warpcast.com/~/compose?text=Just%20got%20the%20sickest%20news%20-%20your%20fren%20is%20now%20officially%20part%20of%20the%20FBI%20crew!&embeds[]=https://fbi-results.vercel.app//selected.png',
             },
           ],
         }),
